@@ -1,0 +1,42 @@
+/* styles.css */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #2c6d1f;
+    color: white;
+    cursor: pointer;
+}
+
+tr:nth-child(odd) {
+    background-color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #e0f5e0;
+}
+
+tr:hover {
+    background-color: #b3e6b3;
+}
+
+.expanded {
+    background-color: #e6f7ff;
+}
+
+.sorted-asc:after {
+    content: ' ?';
+}
+
+.sorted-desc:after {
+    content: ' ?';
+}
