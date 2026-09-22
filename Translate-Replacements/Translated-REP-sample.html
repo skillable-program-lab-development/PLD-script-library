@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="ConvertTo-TranslationReportHtml.ps1">
+<title>Translation phrase check - Translated-REP.csv</title>
+<script>document.documentElement.className += " js";</script>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #FFFCF1; --surface: #FFFFFF; --ink: #0A3E28; --muted: #136945; --rule: #D9D6C8;
+  --ok-bg: #136945; --ok-ink: #FFFCF1;
+  --warn-bg: #FFE38B; --warn-ink: #0A3E28;
+  --err-bg: #7000FF; --err-ink: #FFFCF1;
+  --flag: #7000FF; --focus: #7000FF; --row-hover: #FFEFBC;
+  --serif: "Tiempos Headline", Georgia, "Times New Roman", serif;
+  --sans: "Labil Grotesk", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --mono: Consolas, "Cascadia Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0A3E28; --surface: #0D4A30; --ink: #FFFCF1; --muted: #B9E6CF; --rule: #2A6A4C;
+    --ok-bg: #24ED9B; --ok-ink: #0A3E28; --flag: #FFE38B; --focus: #24ED9B; --row-hover: #136945;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 2rem clamp(1rem, 3vw, 2.5rem) 3rem; }
+header h1 { font: 400 clamp(1.75rem, 3vw, 2.5rem)/1.15 var(--serif); margin: 0 0 .35rem; }
+header p { margin: 0; color: var(--muted); }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* Summary: one proportional bar, with a filter button per status underneath */
+.summary { margin: 1.75rem 0 1.25rem; }
+.bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--rule); }
+.bar span { display: block; min-width: 3px; }
+.legend { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0 0; padding: 0; list-style: none; }
+.legend button, .legend .static {
+  display: inline-flex; align-items: center; gap: .5rem; font: inherit; color: inherit;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: .3rem .85rem .3rem .45rem;
+}
+.legend button { cursor: pointer; }
+.legend button[aria-pressed="false"] { opacity: .55; text-decoration: line-through; }
+.legend b { font-variant-numeric: tabular-nums; }
+.swatch { width: .9rem; height: .9rem; border-radius: 50%; flex: none; }
+.swatch.flagged { background: transparent; border: 2px solid var(--flag); }
+
+/* Toolbar only appears when JavaScript is running */
+.toolbar { display: none; flex-wrap: wrap; align-items: end; gap: .75rem 1.25rem; margin-bottom: .75rem; }
+.js .toolbar { display: flex; }
+.toolbar label { display: grid; gap: .2rem; font-size: .875rem; color: var(--muted); }
+.toolbar input[type="search"] {
+  font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 6px; padding: .45rem .7rem; width: min(28rem, 80vw);
+}
+.toolbar .check { display: flex; align-items: center; gap: .45rem; color: var(--ink); font-size: .95rem; }
+.toolbar input[type="checkbox"] { width: 1.05rem; height: 1.05rem; accent-color: var(--focus); }
+.btn { font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--ink); border-radius: 6px; padding: .4rem .9rem; cursor: pointer; }
+.btn:hover { background: var(--row-hover); }
+#result-count { margin: 0 0 .5rem; font-size: .875rem; color: var(--muted); }
+
+/* Table */
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { width: 100%; min-width: 900px; border-collapse: collapse; }
+caption { text-align: left; }
+th, td { padding: .7rem .85rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--rule); }
+thead th { font-weight: 600; font-size: .875rem; white-space: nowrap; background: var(--bg); }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover td { background: var(--row-hover); }
+th .sort { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; gap: .35rem; align-items: center; }
+th .sort::after { content: ""; width: 0; height: 0; border: 4px solid transparent; border-top-color: currentColor; opacity: .3; margin-top: 4px; }
+th[aria-sort="ascending"] .sort::after { border-top-color: transparent; border-bottom-color: currentColor; opacity: 1; margin-top: -4px; }
+th[aria-sort="descending"] .sort::after { opacity: 1; }
+.col-status { width: 12rem; } .col-count { width: 8.5rem; } .col-lines { width: 11rem; }
+.phrase { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 70ch; }
+.clamped { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.toggle { font: inherit; font-size: .8125rem; color: var(--muted); background: none; border: 0; padding: .25rem 0 0; text-decoration: underline; cursor: pointer; }
+.empty-cell { color: var(--muted); font-style: italic; }
+.chip { display: inline-block; font-size: .8125rem; font-weight: 600; line-height: 1.2; padding: .25rem .6rem; border-radius: 999px; white-space: nowrap; }
+.tone-ok { background: var(--ok-bg); color: var(--ok-ink); }
+.tone-warn { background: var(--warn-bg); color: var(--warn-ink); }
+.tone-error { background: var(--err-bg); color: var(--err-ink); }
+.tone-neutral { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+.chip.flag { background: transparent; color: var(--flag); border: 1.5px solid var(--flag); margin-top: .4rem; }
+.case { display: block; margin-top: .4rem; font-size: .8125rem; color: var(--muted); }
+.error-text { display: block; margin-top: .4rem; font-size: .875rem; color: var(--err-bg); font-weight: 600; }
+@media (prefers-color-scheme: dark) { .error-text { color: #FFE38B; } }
+details { margin-top: .4rem; font-size: .8125rem; color: var(--muted); }
+details summary { cursor: pointer; }
+details p { margin: .3rem 0 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
+.counts { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.counts dl { margin: 0; display: grid; grid-template-columns: auto auto; gap: .1rem .6rem; }
+.counts dt { color: var(--muted); font-size: .8125rem; } .counts dd { margin: 0; text-align: right; }
+.lines { display: flex; flex-wrap: wrap; gap: .25rem; }
+.line { font: .8125rem/1.4 var(--mono); padding: .05rem .4rem; border: 1px solid var(--rule); border-radius: 4px; }
+.none { color: var(--muted); font-size: .875rem; }
+.lines-group + .lines-group { margin-top: .45rem; }
+.lines-group small { display: block; color: var(--muted); font-size: .75rem; margin-bottom: .15rem; }
+.no-results td { text-align: center; padding: 2.5rem 1rem; color: var(--muted); }
+footer { margin-top: 1.5rem; font-size: .8125rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+@media print {
+  :root { --bg: #fff; --surface: #fff; --row-hover: transparent; }
+  .toolbar, .toggle, #result-count { display: none !important; }
+  .clamped { display: block; -webkit-line-clamp: unset; overflow: visible; }
+  .table-scroll { overflow: visible; border: 0; }
+  table { min-width: 0; font-size: 10pt; }
+  tr { break-inside: avoid; }
+  details { display: block; } details > * { display: block; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+<h1>Translation phrase check</h1>
+<p>56 rows from <strong>Translated-REP.csv</strong>, generated <time datetime="2026-09-22T17:49:01">2026-09-22 17:49</time>.</p>
+</header>
+<section class="summary" aria-labelledby="summary-heading">
+<h2 id="summary-heading" class="visually-hidden">Summary by status</h2>
+<div class="bar" role="img" aria-label="Not in source 28 (50%), Found 28 (50%)"><span class="tone-warn" style="flex-grow:50"></span><span class="tone-ok" style="flex-grow:50"></span></div>
+<ul class="legend"><li><button type="button" aria-pressed="true" data-filter-status="NotFoundInSource"><span class="swatch tone-warn"></span>Not in source <b>28</b><span class="visually-hidden"> rows, 50 percent. Toggle filter.</span></button></li><li><button type="button" aria-pressed="true" data-filter-status="Found"><span class="swatch tone-ok"></span>Found <b>28</b><span class="visually-hidden"> rows, 50 percent. Toggle filter.</span></button></li><li><span class="static"><span class="swatch flagged"></span>Counts differ <b>6</b></span></li></ul>
+</section>
+<div class="toolbar" role="search">
+<label for="filter-text">Search phrases, translations and messages<input type="search" id="filter-text" autocomplete="off" spellcheck="false"></label>
+<label class="check" for="filter-flag"><input type="checkbox" id="filter-flag">Only rows where counts differ</label>
+<button type="button" class="btn" id="filter-reset">Reset view</button>
+</div>
+<p id="result-count" aria-live="polite"></p>
+<div class="table-scroll" tabindex="0" role="region" aria-labelledby="results-caption">
+<table id="results">
+<caption id="results-caption" class="visually-hidden">Phrase check results from Translated-REP.csv</caption>
+<thead><tr>
+<th scope="col" class="col-status" data-sort-key="tone" aria-sort="none"><button type="button" class="sort">Status</button></th>
+<th scope="col" data-sort-key="source" aria-sort="none"><button type="button" class="sort">Source phrase</button></th>
+<th scope="col">Translated phrase</th>
+<th scope="col" class="col-count" data-sort-key="srccount" aria-sort="none"><button type="button" class="sort">Occurrences</button></th>
+<th scope="col" class="col-lines">Lines</th>
+</tr></thead>
+<tbody>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="3 Select **CoreServicesVnet**." data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;3 Select **CoreServicesVnet**. &#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">3 Select **CoreServicesVnet**. </div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="Found" data-flagged="" data-sort-tone="3" data-sort-source="Go to [Azure portal](https://portal.azure.com/)" data-sort-srccount="2" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span><br><span class="chip flag">Counts differ</span></td><td><div class="phrase">Go to [Azure portal](https://portal.azure.com/)</div></td><td><div class="phrase" lang="und">[Azure ポータル](https://portal.azure.com/)に移動します。</div></td><td class="counts"><dl><dt>Source</dt><dd>2</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">114</span><span class="line">278</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">136</span></span></div></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| Contoso.com" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;| Contoso.com&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">| Contoso.com</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| TestVM1" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;| TestVM1&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">| TestVM1</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| TestUser" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;| TestUser&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">| TestUser</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| TestPa$$w0rd!" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;| TestPa$$w0rd!&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">| TestPa$$w0rd!</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| TestVM2" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;| TestVM2&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">| TestVM2</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="Enter the command ping TestVM2.contoso.com." data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;Enter the command ping TestVM2.contoso.com.&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">Enter the command ping TestVM2.contoso.com.</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| ManufacturingVM" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;| ManufacturingVM &#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">| ManufacturingVM </div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="On TestVM1, open a PowerShell prompt, and run the following command: ipconfig" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">On TestVM1, open a PowerShell prompt, and run the following command: ipconfig
+</div></td><td><div class="phrase" lang="und">TestVM1 で PowerShell プロンプトを開き、次のコマンドを実行します: ipconfig</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">509</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">526</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="Test-NetConnection 10.20.20.4 -port 3389" data-sort-srccount="4" data-sort-trcount="4"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">Test-NetConnection 10.20.20.4 -port 3389</div></td><td><div class="phrase" lang="und">Test-NetConnection 10.20.20.4 -port 3389</div></td><td class="counts"><dl><dt>Source</dt><dd>4</dd><dt>Translation</dt><dd>4</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">519</span><span class="line">523</span><span class="line">575</span><span class="line">579</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">537</span><span class="line">540</span><span class="line">592</span><span class="line">595</span></span></div></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| CoreServicesVnet-to-ManufacturingVnet" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;| CoreServicesVnet-to-ManufacturingVnet&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">| CoreServicesVnet-to-ManufacturingVnet</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| ManufacturingVnet-to-CoreServicesVnet" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;| ManufacturingVnet-to-CoreServicesVnet&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">| ManufacturingVnet-to-CoreServicesVnet</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="1. Delete all resource groups you created throughout the labs of this module by running the following command: ```powers" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;1. Delete all resource groups you created throughout the labs of this module by running the following command:
+
+   ```powershell
+   Remove-AzResourceGroup -Name &#39;NAME OF THE RG&#39; -Force -AsJob
+   ```
+
+    &gt;**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">1. Delete all resource groups you created throughout the labs of this module by running the following command:
+
+   ```powershell
+   Remove-AzResourceGroup -Name &#39;NAME OF THE RG&#39; -Force -AsJob
+   ```
+
+    &gt;**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="Found" data-flagged="" data-sort-tone="3" data-sort-source="```powershell $RGName = &quot;ContosoResourceGroup&quot; New-AzResourceGroupDeployment -ResourceGroupName $RGName -Templ" data-sort-srccount="1" data-sort-trcount="0"><td><span class="chip tone-ok">Found</span><br><span class="chip flag">Counts differ</span></td><td><div class="phrase">   ```powershell
+   $RGName = &quot;ContosoResourceGroup&quot;
+   
+   New-AzResourceGroupDeployment -ResourceGroupName $RGName -TemplateFile azuredeploy.json -TemplateParameterFile azuredeploy.parameters.json
+   ```</div></td><td><div class="phrase" lang="und">```powershell
+   $RGName = &quot;ContosoResourceGroup&quot;
+   
+   New-AzResourceGroupDeployment -ResourceGroupName $RGName -TemplateFile azuredeploy.json -TemplateParameterFile azuredeploy.parameters.json
+   ```</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>0</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">334</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">0</span></span></div></td></tr>
+<tr data-status="Found" data-flagged="" data-sort-tone="3" data-sort-source="Name | CoreServicesVnet" data-sort-srccount="1" data-sort-trcount="0"><td><span class="chip tone-ok">Found</span><br><span class="chip flag">Counts differ</span></td><td><div class="phrase">Name               | CoreServicesVnet</div></td><td><div class="phrase" lang="und">|              | Name               | CoreServicesVnet     |</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>0</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">143</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">0</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="Subnet address range | 10.20.0.0/27" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">Subnet address range | 10.20.0.0/27</div></td><td><div class="phrase" lang="und">サブネットのアドレス範囲 | 10.20.0.0/27</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">155</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">177</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="Subnet address range | 10.20.10.0/24" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">Subnet address range | 10.20.10.0/24 </div></td><td><div class="phrase" lang="und">サブネットのアドレス範囲 | 10.20.10.0/24</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">157</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">179</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="Subnet address range | 10.20.20.0/24" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">Subnet address range | 10.20.20.0/24</div></td><td><div class="phrase" lang="und">サブネットのアドレス範囲 | 10.20.20.0/24</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">159</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">181</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="Subnet address range | 10.20.30.0/24" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">Subnet address range | 10.20.30.0/24</div></td><td><div class="phrase" lang="und">サブネットのアドレス範囲 | 10.20.30.0/24</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">161</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">183</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="Subnet address range | 10.30.10.0/24" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">Subnet address range | 10.30.10.0/24</div></td><td><div class="phrase" lang="und">サブネットのアドレス範囲 | 10.30.10.0/24</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">181</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">203</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="Subnet address range | 10.30.20.0/24" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">Subnet address range | 10.30.20.0/24</div></td><td><div class="phrase" lang="und">サブネットのアドレス範囲 | 10.30.20.0/24</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">183</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">205</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="Subnet address range | 10.30.21.0/24" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">Subnet address range | 10.30.21.0/24</div></td><td><div class="phrase" lang="und">サブネットのアドレス範囲 | 10.30.21.0/24</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">185</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">207</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="Subnet address range | 10.30.22.0/24" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">Subnet address range | 10.30.22.0/24</div></td><td><div class="phrase" lang="und">サブネットのアドレス範囲 | 10.30.22.0/24</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">187</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">209</span></span></div></td></tr>
+<tr data-status="Found" data-flagged="" data-sort-tone="3" data-sort-source="Name | ManufacturingVnet" data-sort-srccount="1" data-sort-trcount="0"><td><span class="chip tone-ok">Found</span><br><span class="chip flag">Counts differ</span></td><td><div class="phrase">Name               | ManufacturingVnet</div></td><td><div class="phrase" lang="und">Name               | ManufacturingVnet</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>0</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">174</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">0</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="IPv4 address space | 10.30.0.0/16" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">IPv4 address space | 10.30.0.0/16</div></td><td><div class="phrase" lang="und">IPv4 アドレス空間 | 10.30.0.0/16</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">176</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">198</span></span></div></td></tr>
+<tr data-status="Found" data-flagged="" data-sort-tone="3" data-sort-source="Name | ResearchVnet" data-sort-srccount="1" data-sort-trcount="0"><td><span class="chip tone-ok">Found</span><br><span class="chip flag">Counts differ</span></td><td><div class="phrase">Name               | ResearchVnet</div></td><td><div class="phrase" lang="und">Name               | ResearchVnet</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>0</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">194</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">0</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="IPv4 address space | 10.40.0.0/16" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">IPv4 address space | 10.40.0.0/16</div></td><td><div class="phrase" lang="und">IPv4 アドレス空間 | 10.40.0.0/16</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">196</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">218</span></span></div></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="Subnet name | ResearchSystemSubnet" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;Subnet name          | ResearchSystemSubnet&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">Subnet name          | ResearchSystemSubnet</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="Subnet address range | 10.40.0.0/24" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">Subnet address range | 10.40.0.0/24</div></td><td><div class="phrase" lang="und">サブネットのアドレス範囲 | 10.40.0.0/24</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">201</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">223</span></span></div></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="**North Europe**" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;**North Europe**&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">**North Europe**</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="**West India**" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;**West India**&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">**West India**</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="(Europe) North Europe" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;(Europe) North Europe&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">(Europe) North Europe</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| North Europe" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;| North Europe&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">| North Europe</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| West India" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;| West India&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">| West India</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="ContosoResourceGroup" data-sort-srccount="10" data-sort-trcount="10"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">ContosoResourceGroup</div></td><td><div class="phrase" lang="und">ContosoResourceGroup</div></td><td class="counts"><dl><dt>Source</dt><dd>10</dd><dt>Translation</dt><dd>10</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">124</span><span class="line">129</span><span class="line">142</span><span class="line">173</span><span class="line">193</span><span class="line">289</span><span class="line">309</span><span class="line">335</span><span class="line">467</span><span class="line">591</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">146</span><span class="line">151</span><span class="line">164</span><span class="line">195</span><span class="line">215</span><span class="line">311</span><span class="line">331</span><span class="line">357</span><span class="line">487</span><span class="line">607</span></span></div></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="username **TestUser** and the password **TestPa$$w0rd!**" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;username **TestUser** and the password **TestPa$$w0rd!**&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">username **TestUser** and the password **TestPa$$w0rd!**</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="TestPa$w0rd!" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;TestPa$w0rd!&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">TestPa$w0rd!</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="## Task 1: Create the Contoso resource group" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">## Task 1: Create the Contoso resource group</div></td><td><div class="phrase" lang="und">## タスク 1: Contoso のリソース グループを作成する</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">112</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">134</span></span></div></td></tr>
+<tr data-status="Found" data-flagged="" data-sort-tone="3" data-sort-source="```powershell +++Test-NetConnection 10.20.20.4 -port 3389+++ ```" data-sort-srccount="2" data-sort-trcount="0"><td><span class="chip tone-ok">Found</span><br><span class="chip flag">Counts differ</span></td><td><div class="phrase">   ```powershell
+    +++Test-NetConnection 10.20.20.4 -port 3389+++
+    ```</div></td><td><div class="phrase" lang="und">```powershell
+    Test-NetConnection 10.20.20.4 -port 3389
+    ```</div></td><td class="counts"><dl><dt>Source</dt><dd>2</dd><dt>Translation</dt><dd>0</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">520</span><span class="line">576</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">0</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="![Contoso.com DNS zone showing auto-registered host A records.](../media/contoso_com-dns-zone.png)" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">![Contoso.com DNS zone showing auto-registered host A records.](../media/contoso_com-dns-zone.png)
+</div></td><td><div class="phrase" lang="und">![自動登録されたホスト A レコードが示されている contoso.com の DNS ゾーン。](../media/contoso_com-dns-zone.png)</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">357</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">374</span></span></div></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="![contoso.com | Virtual links with + Add highlighted.](../media/add-network-link-dns.png)" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;![contoso.com | Virtual links with + Add highlighted.](../media/add-network-link-dns.png)
+&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">![contoso.com | Virtual links with + Add highlighted.](../media/add-network-link-dns.png)
+</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="![Contoso.com DNS zone showing auto-registered host A records.](../media/contoso_com-dns-zone.png)" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">![Contoso.com DNS zone showing auto-registered host A records.](../media/contoso_com-dns-zone.png)
+</div></td><td><div class="phrase" lang="und">![自動登録されたホスト A レコードが示されている contoso.com の DNS ゾーン。](../media/contoso_com-dns-zone.png)</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">357</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">374</span></span></div></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="![TestVM1 with Connect and RDP highlighted.](../media/connect-to-am.png)" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;![TestVM1 with Connect and RDP highlighted.](../media/connect-to-am.png)
+&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">![TestVM1 with Connect and RDP highlighted.](../media/connect-to-am.png)
+</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="![TestVM1 with Connect and RDP highlighted.](../media/connect-to-am.png)" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;![TestVM1 with Connect and RDP highlighted.](../media/connect-to-am.png)
+&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">![TestVM1 with Connect and RDP highlighted.](../media/connect-to-am.png)
+</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="&gt;**Note**: If you don&#39;t have a &quot;MOC Subscription&quot;, use the subscription you&#39;ve been using previousl" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39; &gt;**Note**: If you don&#39;t have a &quot;MOC Subscription&quot;, use the subscription you&#39;ve been using previously. It&#39;s just a name.
+&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase"> &gt;**Note**: If you don&#39;t have a &quot;MOC Subscription&quot;, use the subscription you&#39;ve been using previously. It&#39;s just a name.
+</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="&gt;**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to " data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;    &gt;**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">    &gt;**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="&gt;**Note**: Remember to remove any newly created Azure resources that you no longer use. Removing unused resources ens" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">   &gt;**Note**: Remember to remove any newly created Azure resources that you no longer use. Removing unused resources ensures you will not see unexpected charges.
+</div></td><td><div class="phrase" lang="und">&gt;**注**:新規に作成し、使用しなくなったすべての Azure リソースを削除することを忘れないでください。 使用していないリソースを削除することで、予期しない料金が発生しなくなります。</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">588</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">600</span></span></div></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="| &gt;**Note**: If you don&#39;t have a &quot;MOC Subscription&quot;, use the subscription you&#39;ve been using previou" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;|
+
+ &gt;**Note**: If you don&#39;t have a &quot;MOC Subscription&quot;, use the subscription you&#39;ve been using previously. It&#39;s just a name.&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">|
+
+ &gt;**Note**: If you don&#39;t have a &quot;MOC Subscription&quot;, use the subscription you&#39;ve been using previously. It&#39;s just a name.</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="[ip address configuration for azure virtual network deployment ](../media/default-vnet-ip-address-range-annotated.png)" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;[ip address configuration for azure virtual network deployment ](../media/default-vnet-ip-address-range-annotated.png)&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">[ip address configuration for azure virtual network deployment ](../media/default-vnet-ip-address-range-annotated.png)</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="![Create a virtual network wizard.](../media/create-virtual-network.png)" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;![Create a virtual network wizard.](../media/create-virtual-network.png)&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">![Create a virtual network wizard.](../media/create-virtual-network.png)</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="NotFoundInSource" data-sort-tone="1" data-sort-source="&gt;[!KNOWLEDGE] If you receive a &quot;Tenant User Over Quota&quot; error, change your **Cloud Shell Region** to an alt" data-sort-srccount="0" data-sort-trcount="0"><td><span class="chip tone-warn">Not in source</span><details><summary>Message</summary><p>The phrase &#39;    &gt;[!KNOWLEDGE] If you receive a &quot;Tenant User Over Quota&quot; error, change your **Cloud Shell Region** to an alternative region.&#39; was not found in the English (source) string.</p></details></td><td><div class="phrase">    &gt;[!KNOWLEDGE] If you receive a &quot;Tenant User Over Quota&quot; error, change your **Cloud Shell Region** to an alternative region.</div></td><td><span class="empty-cell">No translation</span></td><td class="counts"><dl><dt>Source</dt><dd>0</dd><dt>Translation</dt><dd>0</dd></dl></td><td><span class="none">None</span></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="IPv4 address space | 10.20.0.0/16" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">IPv4 address space | 10.20.0.0/16</div></td><td><div class="phrase" lang="und">IPv4 アドレス空間 | 10.20.0.0/16</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">147</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">167</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="### Create ManufacturingVM" data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">### Create ManufacturingVM</div></td><td><div class="phrase" lang="und">### ManufacturingVM を作成する</div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">453</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">471</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="&gt;**Note:** You will be prompted to provide an Admin password. You will need this password in a later step." data-sort-srccount="1" data-sort-trcount="1"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">   &gt;**Note:** You will be prompted to provide an Admin password. You will need this password in a later step.</div></td><td><div class="phrase" lang="und">   &gt;**注**: 管理者パスワードを入力するように求められます。 このパスワードは後の手順で必要になります。 </div></td><td class="counts"><dl><dt>Source</dt><dd>1</dd><dt>Translation</dt><dd>1</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">334</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">354</span></span></div></td></tr>
+<tr data-status="Found" data-sort-tone="3" data-sort-source="&gt;**Note:** If you are working in your own subscription the [template files](https://github.com/MicrosoftLearning/AZ-7" data-sort-srccount="2" data-sort-trcount="2"><td><span class="chip tone-ok">Found</span></td><td><div class="phrase">   &gt;**Note:** If you are working in your own subscription the [template files](https://github.com/MicrosoftLearning/AZ-700-Designing-and-Implementing-Microsoft-Azure-Networking-Solutions/tree/master/Allfiles/Exercises) are available in the GitHub lab repository.</div></td><td><div class="phrase" lang="und">&gt;**注:** 自分のサブスクリプションで作業している場合、[テンプレート ファイル](https://github.com/MicrosoftLearning/AZ-700-Designing-and-Implementing-Microsoft-Azure-Networking-Solutions/tree/master/Allfiles/Exercises)は GitHub ラボ リポジトリで入手できます。</div></td><td class="counts"><dl><dt>Source</dt><dd>2</dd><dt>Translation</dt><dd>2</dd></dl></td><td><div class="lines-group"><small>Source</small><span class="lines"><span class="line">330</span><span class="line">464</span></span></div><div class="lines-group"><small>Translation</small><span class="lines"><span class="line">350</span><span class="line">480</span></span></div></td></tr>
+<tr class="no-results" hidden><td colspan="5">No rows match these filters. Clear the search or select Reset view.</td></tr>
+</tbody>
+</table>
+</div>
+<footer><p>Source data: Translated-REP.csv (56 rows). &ldquo;Counts differ&rdquo; marks Found rows where the source and translation occurrence counts aren&rsquo;t equal.</p></footer>
+</main>
+<script>
+(function () {
+  'use strict';
+  var table = document.getElementById('results');
+  if (!table) { return; }
+  var tbody = table.tBodies[0];
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr[data-status]'));
+  var emptyRow = tbody.querySelector('.no-results');
+  var search = document.getElementById('filter-text');
+  var flagOnly = document.getElementById('filter-flag');
+  var reset = document.getElementById('filter-reset');
+  var countOut = document.getElementById('result-count');
+  var statusButtons = Array.prototype.slice.call(document.querySelectorAll('[data-filter-status]'));
+  var sortState = { key: null, dir: 0 };
+
+  rows.forEach(function (row, i) {
+    row._index = i;
+    row._text = row.textContent.toLowerCase();
+  });
+
+  function activeStatuses() {
+    var set = {};
+    statusButtons.forEach(function (b) {
+      if (b.getAttribute('aria-pressed') === 'true') { set[b.getAttribute('data-filter-status')] = true; }
+    });
+    return set;
+  }
+
+  function applyFilters() {
+    var terms = search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    var statuses = activeStatuses();
+    var onlyFlagged = flagOnly.checked;
+    var shown = 0;
+    rows.forEach(function (row) {
+      var visible = statuses[row.getAttribute('data-status')] === true &&
+        (!onlyFlagged || row.hasAttribute('data-flagged')) &&
+        terms.every(function (t) { return row._text.indexOf(t) !== -1; });
+      row.hidden = !visible;
+      if (visible) { shown++; }
+    });
+    emptyRow.hidden = shown !== 0;
+    countOut.textContent = 'Showing ' + shown + ' of ' + rows.length + ' rows';
+  }
+
+  function sortValue(row, key) {
+    var v = row.getAttribute('data-sort-' + key) || '';
+    return (key === 'srccount' || key === 'trcount' || key === 'tone') ? Number(v) : v.toLowerCase();
+  }
+
+  function applySort() {
+    var key = sortState.key, dir = sortState.dir;
+    var ordered = rows.slice().sort(function (a, b) {
+      if (!key || dir === 0) { return a._index - b._index; }
+      var x = sortValue(a, key), y = sortValue(b, key);
+      var c = (typeof x === 'number') ? x - y : x.localeCompare(y);
+      return (c === 0 ? a._index - b._index : c) * dir;
+    });
+    var frag = document.createDocumentFragment();
+    ordered.forEach(function (r) { frag.appendChild(r); });
+    frag.appendChild(emptyRow);
+    tbody.appendChild(frag);
+    Array.prototype.forEach.call(table.tHead.querySelectorAll('th[data-sort-key]'), function (th) {
+      var state = (th.getAttribute('data-sort-key') === key && dir !== 0) ? (dir === 1 ? 'ascending' : 'descending') : 'none';
+      th.setAttribute('aria-sort', state);
+    });
+  }
+
+  Array.prototype.forEach.call(table.tHead.querySelectorAll('th[data-sort-key]'), function (th) {
+    th.querySelector('button').addEventListener('click', function () {
+      var key = th.getAttribute('data-sort-key');
+      if (sortState.key !== key) { sortState = { key: key, dir: 1 }; }
+      else { sortState.dir = sortState.dir === 1 ? -1 : (sortState.dir === -1 ? 0 : 1); }
+      applySort();
+    });
+  });
+
+  statusButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      applyFilters();
+    });
+  });
+
+  var timer;
+  search.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(applyFilters, 120); });
+  flagOnly.addEventListener('change', applyFilters);
+  reset.addEventListener('click', function () {
+    search.value = '';
+    flagOnly.checked = false;
+    statusButtons.forEach(function (b) { b.setAttribute('aria-pressed', 'true'); });
+    sortState = { key: null, dir: 0 };
+    applySort();
+    applyFilters();
+    search.focus();
+  });
+
+  // Collapse long phrases to four lines, with an accessible toggle only where text overflows.
+  Array.prototype.forEach.call(document.querySelectorAll('.phrase'), function (el, i) {
+    el.classList.add('clamped');
+    if (el.scrollHeight <= el.clientHeight + 1) { el.classList.remove('clamped'); return; }
+    if (!el.id) { el.id = 'phrase-' + i; }
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'toggle';
+    btn.setAttribute('aria-controls', el.id);
+    btn.setAttribute('aria-expanded', 'false');
+    btn.textContent = 'Show full text';
+    btn.addEventListener('click', function () {
+      var expand = el.classList.contains('clamped');
+      el.classList.toggle('clamped', !expand);
+      btn.setAttribute('aria-expanded', String(expand));
+      btn.textContent = expand ? 'Show less' : 'Show full text';
+    });
+    el.insertAdjacentElement('afterend', btn);
+  });
+
+  window.addEventListener('beforeprint', function () {
+    Array.prototype.forEach.call(document.querySelectorAll('details'), function (d) { d.open = true; });
+  });
+
+  applyFilters();
+}());
+</script>
+</body>
+</html>
