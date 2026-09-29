@@ -89,8 +89,15 @@ param
 )
 
 class FindResult {
+#	[string]$LabSeries
+#	[int]$LabProfile
+#	[string]$Location
+#	[string]$Term
+#	[int]$Found
 	[string]$LabSeries
+	[string]$LabSeriesName
 	[int]$LabProfile
+	[string]$LabProfileName
 	[string]$Location
 	[string]$Term
 	[int]$Found
@@ -117,7 +124,30 @@ function Write-Note {
 	
 }
 
-function Invoke-WithRetry {
+$seriesNameCache = @{
+}
+
+Function Get-SeriesName {
+	Param ($seriesId)
+	$key = [string]$seriesId
+	If ([string]::IsNullOrEmpty($key)) {
+		Return ''
+	}
+	If (-not $script:seriesNameCache.ContainsKey($key)) {
+		Try {
+			$s = Invoke-WithRetry {
+				Get-LODLabSeries -ID $key
+			}
+			$script:seriesNameCache[$key] = $s.Name
+		} Catch {
+			Write-Note -note "  WARNING: Could not resolve Lab Series name for ID $($key)"
+			$script:seriesNameCache[$key] = '(lookup failed)'
+		}
+	}
+	Return $script:seriesNameCache[$key]
+}
+
+Function Invoke-WithRetry {
 	param
 	(
 		[scriptblock]$Command,
@@ -198,18 +228,27 @@ function Get-TermFrequency {
 				} else {
 					$cnt += ([regex]::Matches($Text, $itm)).Count
 				}
-				if ($cnt -eq 0) {
-					$fnd = $false
-					$count = 0
-					break
+#				if ($cnt -eq 0) {
+#					$fnd = $false
+#					$count = 0
+#					break
+#				}
+				$termCnt = If ($CaseMode -eq "Any") {
+					([regex]::Matches($Text.ToLower(), $itm.ToLower())).Count
+				} Else {
+					([regex]::Matches($Text, $itm)).Count
+				}
+				If ($termCnt -eq 0) {
+					$count = 0; Break
 				}
 			}
-		} else {
+		} Else {
 			# Build regex based on MatchType
 			$escaped = [regex]::Escape($normalizedTerm)
+			$escaped = ([regex]::Escape($normalizedTerm)).Trim()
 			
-			$escaped.Trim()
-			$pattern = switch ($MatchType) {
+			#			$escaped.Trim()
+			$pattern = Switch ($MatchType) {
 				"Exact"      {
 					"^\b$escaped\b$"
 				} # full exact match
@@ -224,9 +263,9 @@ function Get-TermFrequency {
 				} # anywhere in the text
 			}
 			
-			if ($CaseMode -eq "Any") {
+			If ($CaseMode -eq "Any") {
 				$count = ([regex]::Matches($Text.ToLower(), ([string]$pattern).ToLower())).Count
-			} else {
+			} Else {
 				$count = ([regex]::Matches($Text, $pattern)).Count
 			}
 		}
@@ -243,10 +282,23 @@ function Get-TermFrequency {
 	}
 }
 
-function Process-LabProfile {
+Function Add-FindResult ($Location, $Row) {
+	$tmpResult.Add([FindResult]@{
+			LabSeries	   = $seriesId
+			LabSeriesName  = $seriesName
+			LabProfile	   = $labId
+			LabProfileName = $labName
+			Location	   = $Location
+			Term		   = $Row.Term
+			Found		   = $Row.Found
+		})
+}
+
+Function Process-LabProfile {
 	[CmdletBinding()]
 	param
 	(
+		$seriesId,
 		$seriesName,
 		$labId
 	)
@@ -276,8 +328,14 @@ function Process-LabProfile {
 			Get-LODLabProfile -ID $labId
 		} 
 		$labName = $labProfile.Name
-		if ($seriesName.Length -eq 0) {
-			$seriesName = $labProfile.SeriesId
+#		if ($seriesName.Length -eq 0) {
+#			$seriesName = $labProfile.SeriesId
+#		}
+		If ([string]::IsNullOrEmpty($seriesId)) {
+			$seriesId = $labProfile.SeriesId
+		}
+		If ([string]::IsNullOrEmpty($seriesName)) {
+			$seriesName = Get-SeriesName $seriesId
 		}
 		Write-Note -note "Processing Profile: ($($labProfile.Number)) $($labName)"
 		$cont = $true
@@ -337,14 +395,15 @@ function Process-LabProfile {
 							foreach ($row in $tmpInst) {
 								#							foreach ($Term in $lstTerms) {
 								if ($row.Found -gt 0) {
-									$tmpResult.Add([FindResult]@{
-											LabSeries  = $seriesName
-											LabProfile = $labId
-											Location   = "ACP ($($ACP.Id) - $($ACP.Name))"
-											Term	   = $row.Term
-											Found	   = $row.Found
-										}
-									)
+#									$tmpResult.Add([FindResult]@{
+#											LabSeries  = $seriesName
+#											LabProfile = $labId
+#											Location   = "ACP ($($ACP.Id) - $($ACP.Name))"
+#											Term	   = $row.Term
+#											Found	   = $row.Found
+#										}
+#									)
+									Add-FindResult -Location "ACP ($($ACP.Id) - $($ACP.Name))" -Row $row
 								}
 								Write-Note -note "  Term:  $($row.Term)"
 								Write-Note -note "  Loc:   ACP ($($ACP.Id) - $($ACP.Name))"
@@ -370,14 +429,15 @@ function Process-LabProfile {
 								foreach ($row in $tmpInst) {
 									#								foreach ($Term in $lstTerms) {
 									if ($row.Found -gt 0) {
-										$tmpResult.Add([FindResult]@{
-												LabSeries  = $seriesName
-												LabProfile = $labId
-												Location   = "LCA ($($LCA.Id) - $($LCA.Name))"
-												Term	   = $row.Term
-												Found	   = $row.Found
-											}
-										)
+#										$tmpResult.Add([FindResult]@{
+#												LabSeries  = $seriesName
+#												LabProfile = $labId
+#												Location   = "LCA ($($LCA.Id) - $($LCA.Name))"
+#												Term	   = $row.Term
+#												Found	   = $row.Found
+#											}
+										#										)
+										Add-FindResult -Location "LCA ($($LCA.Id) - $($LCA.Name))" -Row $row
 									}
 									Write-Note -note "  Term:  $($row.Term)"
 									Write-Note -note "  Loc:   LCA ($($LCA.Id) - $($LCA.Name))"
@@ -405,17 +465,17 @@ function Process-LabProfile {
 								foreach ($row in $tmpInst) {
 									#								foreach ($Term in $lstTerms) {
 									if ($row.Found -gt 0) {
-										$tmpResult.Add([FindResult]@{
-												LabSeries  = $seriesName
-												LabProfile = $labId
-												Location   = "Activity ($($Act.Id) - $($Act.Name)) Script ($actScript.Id)"
-												Term	   = $row.Term
-												Found	   = $row.Found
-											}
-										)
-									}
+#										$tmpResult.Add([FindResult]@{
+#												LabSeries  = $seriesName
+#												LabProfile = $labId
+#												Location   = "Activity ($($Act.Id) - $($Act.Name)) Script ($actScript.Id)"
+#												Term	   = $row.Term
+#												Found	   = $row.Found
+#											}
+#										)
+									Add-FindResult -Location "Activity ($($Act.Id) - $($Act.Name)) Script $($actScript.Id)" -Row $row									}
 									Write-Note -note "  Term:  $($row.Term)"
-									Write-Note -note "  Loc:   Activity ($($Act.Id) - $($Act.Name)) Script ($actScript.Id)"
+									Write-Note -note "  Loc:   Activity ($($Act.Id) - $($Act.Name)) Script $($actScript.Id)"
 									Write-Note -note "  Found: $($row.Found) times"
 									#								}
 								}
@@ -471,14 +531,15 @@ function Process-LabProfile {
 										foreach ($row in $tmpInst) {
 											#										foreach ($Term in $lstTerms) {
 											if ($row.Found -gt 0) {
-												$tmpResult.Add([FindResult]@{
-														LabSeries  = $seriesName
-														LabProfile = $labId
-														Location   = "Instructions ($($inst.instructionsSetId))"
-														Term	   = $row.Term
-														Found	   = $row.Found
-													}
-												)
+#												$tmpResult.Add([FindResult]@{
+#														LabSeries  = $seriesName
+#														LabProfile = $labId
+#														Location   = "Instructions ($($inst.instructionsSetId))"
+#														Term	   = $row.Term
+#														Found	   = $row.Found
+#													}
+#												)
+												Add-FindResult -Location "Instructions ($($inst.instructionsSetId))" -Row $row
 											}
 											Write-Note -note "  Term:  $($row.Term)"
 											Write-Note -note "  Loc:   Instructions ($($inst.instructionsSetId))"
@@ -493,17 +554,19 @@ function Process-LabProfile {
 											foreach ($row in $tmpInst) {
 												#											foreach ($Term in $lstTerms) {
 												if ($row.Found -gt 0) {
-													$tmpResult.Add([FindResult]@{
-															LabSeries  = $seriesName
-															LabProfile = $labId
-															Location   = "Instructions ($($inst.instructionsSetId)) - Replacements (Text: $($rep.Text))"
-															Term	   = $row.Term
-															Found	   = $row.Found
-														}
-													)
+#													$tmpResult.Add([FindResult]@{
+#															LabSeries  = $seriesName
+#															LabProfile = $labId
+#															Location   = "Instructions ($($inst.instructionsSetId)) - Replacements (Text: $($rep.Text))"
+#															Term	   = $row.Term
+#															Found	   = $row.Found
+#														}
+#													)
+													Add-FindResult -Location "Instructions ($($inst.instructionsSetId)) - Replacements (Text: $($rep.Text))" -Row $row
 												}
 												Write-Note -note "  Term:  $($row.Term)"
 												Write-Note -note "  Loc:   Instructions ($($inst.instructionsSetId)) - Replacements (Text: $($rep.Text))"
+#												Write-Note -note "  Loc:   Instructions ($($inst.instructionsSetId)) - Replacements (Text: $($rep.Replacement))"
 												Write-Note -note "  Found: $($row.Found) times"
 												#											}
 											}
@@ -515,17 +578,18 @@ function Process-LabProfile {
 											foreach ($row in $tmpInst) {
 												#											foreach ($Term in $lstTerms) {
 												if ($row.Found -gt 0) {
-													$tmpResult.Add([FindResult]@{
-															LabSeries  = $seriesName
-															LabProfile = $labId
-															Location   = "Instructions ($($inst.instructionsSetId)) - Replacements (Replacement: $($rep.Text))"
-															Term	   = $row.Term
-															Found	   = $row.Found
-														}
-													)
+#													$tmpResult.Add([FindResult]@{
+#															LabSeries  = $seriesName
+#															LabProfile = $labId
+#															Location   = "Instructions ($($inst.instructionsSetId)) - Replacements (Replacement: $($rep.Text))"
+#															Term	   = $row.Term
+#															Found	   = $row.Found
+#														}
+#													)
+													Add-FindResult -Location "Instructions ($($inst.instructionsSetId)) - Replacements (Replacement: $($rep.Replacement))" -Row $row
 												}
 												Write-Note -note "  Term:  $($row.Term)"
-												Write-Note -note "  Loc:   Instructions ($($inst.instructionsSetId)) - Replacements (Replacement: $($rep.Text))"
+												Write-Note -note "  Loc:   Instructions ($($inst.instructionsSetId)) - Replacements (Replacement: $($rep.Replacement))"
 												Write-Note -note "  Found: $($row.Found) times"
 												#											}
 											}
@@ -561,7 +625,8 @@ function Process-LabProfile {
 														$url = $matches[1]
 													}
 													# Replace the language code if required
-													$url = $url.Replace("@lab.LanguageCode", $instructionsSets.InstructionsSets[$z].LanguageShortName)
+#													$url = $url.Replace("@lab.LanguageCode", $instructionsSets.InstructionsSets[$z].LanguageShortName)
+													$url = $url.Replace("@lab.LanguageCode", $instructionsSets.InstructionsSets[$x].LanguageShortName)
 													try {
 														$timeStamp = Get-Date -Format "MMddyy_HHmmss"
 														$outUpdate += "`n$($timeStamp):       Retrieving External Instructions: $($url)"
@@ -582,14 +647,15 @@ function Process-LabProfile {
 													foreach ($row in $tmpInst) {
 														#													foreach ($Term in $lstTerms) {
 														if ($row.Found -gt 0) {
-															$tmpResult.Add([FindResult]@{
-																	LabSeries  = $seriesName
-																	LabProfile = $labId
-																	Location   = "Instructions - GitHub ($($inst.instructionsSetId)) - $url"
-																	Term	   = $row.Term
-																	Found	   = $row.Found
-																}
-															)
+#															$tmpResult.Add([FindResult]@{
+#																	LabSeries  = $seriesName
+#																	LabProfile = $labId
+#																	Location   = "Instructions - GitHub ($($inst.instructionsSetId)) - $url"
+#																	Term	   = $row.Term
+#																	Found	   = $row.Found
+#																}
+#															)
+															Add-FindResult -Location "Instructions - GitHub ($($inst.instructionsSetId)) - $url" -Row $row
 														}
 														Write-Note -note "  Term:  $($row.Term)"
 														Write-Note -note "  Loc:   Instructions - GitHub ($($inst.instructionsSetId)) - $url"
@@ -731,7 +797,8 @@ if ($FindList.Length -gt 0) {
 						# Process each Lab Profile
 						foreach ($Lab in $LabList) {
 							$curId = $Lab.Id
-							Process-LabProfile -seriesName "($($LabSeries)) $($curSeries.Name)" -labId $Lab.Id
+#							Process-LabProfile -seriesName "($($LabSeries)) $($curSeries.Name)" -labId $Lab.Id
+							Process-LabProfile -seriesId $curSeries.Id -seriesName $curSeries.Name -labId $Lab.Id
 						}
 					} catch {
 						Write-Note -note "Error on Process-LabProfile -LabSeriesId $($curSeries.Id)"
@@ -802,11 +869,32 @@ if ($FindList.Length -gt 0) {
 		# Append the data
 		$outResult | Export-Csv -Path $rptName -NoTypeInformation -Encoding UTF8
 	} else {
-		# Create the Report
-		try {
-			Out-File -FilePath $rptName -Append "The Search terms were not found.`r`n  Lab Profile List: $($LabProfileList)`r`n  Find List: $($FindList)`r`n  Find Type: $($FindType)`r`n  Case Type: $($CaseType)" -Encoding UTF8
-		} catch {
-			Write-Note -note "The Search terms were not found.`r`n  Lab Profile List: $($LabProfileList)`r`n  Find List: $($FindList)`r`n  Find Type: $($FindType)`r`n  Case Type: $($CaseType)"
+#		# Create the Report
+#		try {
+#			Out-File -FilePath $rptName -Append "The Search terms were not found.`r`n  Lab Profile List: $($LabProfileList)`r`n  Find List: $($FindList)`r`n  Find Type: $($FindType)`r`n  Case Type: $($CaseType)" -Encoding UTF8
+#		} catch {
+#			Write-Note -note "The Search terms were not found.`r`n  Lab Profile List: $($LabProfileList)`r`n  Find List: $($FindList)`r`n  Find Type: $($FindType)`r`n  Case Type: $($CaseType)"
+#		}
+		
+		# No matches: log the details, then write a header-only CSV so that
+		# Report-FindText.ps1 imports zero rows and the combined schema stays clean
+		$searchScope = If ($LabSeriesList.Length -gt 0) {
+			"Lab Series List: $($LabSeriesList)"
+		} Else {
+			"Lab Profile List: $($LabProfileList)"
+		}
+		Write-Note -note "The Search terms were not found."
+		Write-Note -note "  $($searchScope)"
+		Write-Note -note "  Find List: $($FindList)"
+		Write-Note -note "  Find Type: $($FindType)"
+		Write-Note -note "  Case Type: $($CaseType)"
+		
+		Try {
+			# ConvertTo-Csv emits a header line and a data line; keep only the header
+			$csvHeader = ([FindResult]::new() | ConvertTo-Csv -NoTypeInformation)[0]
+			Set-Content -Path $rptName -Value $csvHeader -Encoding UTF8
+		} Catch {
+			Write-Note -note "ERROR writing empty report $($rptName): $($_.Exception.Message)"
 		}
 	}
 	Write-Note -note "Report written to: $($rptName)"
