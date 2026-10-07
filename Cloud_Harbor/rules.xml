@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<resources version="1.2.0">
+<resources version="1.2.2">
 	<resource type="Microsoft.ApiManagement/service">
 		<enabled>true</enabled>
 		<properties>
@@ -181,6 +181,40 @@
 			</field>
 		</properties>
 	</resource>
+	<resource type="Microsoft.Authorization/roleAssignments">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Authorization/locks">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
 	<resource type="Microsoft.Automation/automationAccounts">
 		<enabled>true</enabled>
 		<properties>
@@ -219,6 +253,23 @@
 				<func>notEquals</func>
 				<valtype>literal</valtype>
 				<value>global</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Automation/automationAccounts/hybridRunbookWorkerGroups">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
 			</field>
 		</properties>
 	</resource>
@@ -351,7 +402,7 @@
 				<name>NOTE</name>
 				<func>equals</func>
 				<valtype>literal</valtype>
-				<value>Unassessed</value>
+				<value>Unassessed - This resource requires an ALL MODE ACP</value>
 			</field>
         </properties>
 	</resource>
@@ -488,6 +539,40 @@
 			</field>
         </properties>
 	</resource>
+	<resource type="Microsoft.Chaos/targets">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Chaos/capabilities">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
 	<resource type="Microsoft.CognitiveServices/accounts">
 		<enabled>true</enabled>
 		<properties>
@@ -501,7 +586,7 @@
 				<name>NOTE</name>
 				<func>equals</func>
 				<valtype>literal</valtype>
-				<value>Risk: High (Compute/Orphans) - Requires Teardown LCA</value>
+				<value>Risk: High (Compute/Orphans) - This resource requires an ALL MODE ACP. Requires Teardown LCA</value>
 			</field>
 			<field>
 				<name>name</name>
@@ -547,6 +632,23 @@
 			</field>
 		</properties>
 	</resource>
+	<resource type="Microsoft.CognitiveServices/accounts/deployments">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
 	<resource type="Microsoft.CognitiveServices/accounts/projects">
 		<enabled>true</enabled>
 		<properties>
@@ -560,7 +662,7 @@
 				<name>NOTE</name>
 				<func>equals</func>
 				<valtype>literal</valtype>
-				<value>Risk: Low - Ancilliary</value>
+				<value>Risk: Low - Ancilliary. This resource requires an ALL MODE ACP</value>
 			</field>
 			<field>
 				<name>name</name>
@@ -579,6 +681,23 @@
 				<func>notEquals</func>
 				<valtype>literal</valtype>
 				<value>global</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.CognitiveServices/accounts/projects/connections">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Unassessed - This resource requires an ALL MODE ACP</value>
 			</field>
 		</properties>
 	</resource>
@@ -652,6 +771,23 @@
 			</field>
 		</properties>
 	</resource>
+	<resource type="Microsoft.Compute/locations/placementRecommendations">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Unassessed - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
 	<resource type="Microsoft.Compute/VirtualMachines">
 		<enabled>true</enabled>
 		<properties>
@@ -702,6 +838,23 @@
 				<func>notEquals</func>
 				<valtype>literal</valtype>
 				<value>global</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Compute/VirtualMachines/runCommands">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Unassessed - This resource requires an ALL MODE ACP</value>
 			</field>
 		</properties>
 	</resource>
@@ -934,6 +1087,23 @@
 			</field>
 		</properties>
 	</resource>
+	<resource type="Microsoft.ContainerService/managedClusters/agentPools">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
 	<resource type="Microsoft.Databricks">
 		<enabled>true</enabled>
 		<properties>
@@ -962,13 +1132,13 @@
 				<value>/resourceGroups/[RESOURCE GROUP NAME]/</value>
 			</field>
 			<field>
-				<name>Microsoft.Sql/servers/databases/sku.name</name>
+				<name>Microsoft.Databricks/workspaces/sku.name</name>
 				<func>equals</func>
 				<valtype>field</valtype>
 				<value>sku.Name</value>
 			</field>
 			<field>
-				<name>Microsoft.Sql/servers/databases/sku.capacity</name>
+				<name>Microsoft.Databricks/workspaces/sku.capacity</name>
 				<func>lessOrEquals</func>
 				<valtype>field</valtype>
 				<value>sku.Capacity</value>
@@ -1277,7 +1447,7 @@
 				<name>NOTE</name>
 				<func>equals</func>
 				<valtype>literal</valtype>
-				<value>Unassessed</value>
+				<value>Unassessed - This resource requires an ALL MODE ACP</value>
 			</field>
         </properties>
 	</resource>
@@ -1354,6 +1524,23 @@
 				<func>notEquals</func>
 				<valtype>literal</valtype>
 				<value>global</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.EventGrid/eventSubscriptions">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
 			</field>
 		</properties>
 	</resource>
@@ -1537,6 +1724,23 @@
 			</field>
 		</properties>
 	</resource>
+	<resource type="Microsoft.Insights/diagnosticSettings">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
 	<resource type="Microsoft.KeyVault/vaults">
 		<enabled>true</enabled>
 		<properties>
@@ -1569,6 +1773,40 @@
 				<func>notEquals</func>
 				<valtype>literal</valtype>
 				<value>global</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.KeyVault/vaults/secrets">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.KeyVault/vaults/keys">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
 			</field>
 		</properties>
 	</resource>
@@ -1677,14 +1915,9 @@
 			</field>
 		</properties>
 	</resource>
-	<resource type="Microsoft.LoadTestService/playwriteWorkspaces">
+	<resource type="Microsoft.LoadTestService/playwrightWorkspaces">
 		<enabled>true</enabled>
-		<requires>"Microsoft.LoadTestService/loadTests"
-		    <properties>
-				
-            </properties>
-		</requires>
-		<properties>
+	    <properties>
 			<field>
 				<name>provisioningState</name>
 				<func>equals</func>
@@ -1695,27 +1928,9 @@
 				<name>NOTE</name>
 				<func>equals</func>
 				<valtype>literal</valtype>
-				<value>Risk: Restricted - Cost: Very High - Notes: Arbitrary compute, known as Azure Load Testing or Azure App Testing</value>
+				<value>Risk: Not Evaluated</value>
 			</field>
-			<field>
-				<name>name</name>
-				<func>equals</func>
-				<valtype>field</valtype>
-				<value>name</value>
-			</field>
-			<field>
-				<name>id</name>
-				<func>contains</func>
-				<valtype>field</valtype>
-				<value>/resourceGroups/[RESOURCE GROUP NAME]/</value>
-			</field>
-			<field>
-				<name>location</name>
-				<func>notEquals</func>
-				<valtype>literal</valtype>
-				<value>global</value>
-			</field>
-		</properties>
+        </properties>
 	</resource>
 	<resource type="Microsoft.Logic/workflows">
 		<enabled>true</enabled>
@@ -1893,6 +2108,91 @@
 				<func>notEquals</func>
 				<valtype>literal</valtype>
 				<value>global</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Network/routeTables/routes">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Network/virtualNetworks/subnets">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Network/virtualNetworks/VirtualNetworkPeerings">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Network/virtualNetworks/networkSecurityGroups/securityRules">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Network/virtualNetworks/routeTable/routes">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
 			</field>
 		</properties>
 	</resource>
@@ -2106,7 +2406,7 @@
 				<name>NOTE</name>
 				<func>equals</func>
 				<valtype>literal</valtype>
-				<value>Risk: Low Ancilliary</value>
+				<value>Risk: Low Ancilliary - This resource requires an ALL MODE ACP</value>
 			</field>
 			<field>
 				<name>name</name>
@@ -2125,6 +2425,23 @@
 				<func>notEquals</func>
 				<valtype>literal</valtype>
 				<value>global</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Resources/subscriptions/resourceGroups">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - Will require ALL MODE if restrictions of RG creation, naming, or region are required</value>
 			</field>
 		</properties>
 	</resource>
@@ -2199,7 +2516,7 @@
 				<name>NOTE</name>
 				<func>equals</func>
 				<valtype>literal</valtype>
-				<value>Risk: Low (Orphans) - Notes: Requires Teardown LCA</value>
+				<value>Risk: Low (Orphans) - Notes: This resource requires an ALL MODE ACP. Requires Teardown LCA</value>
 			</field>
 		</properties>
 	</resource>
@@ -2484,6 +2801,40 @@
 			</field>
 		</properties>
 	</resource>
+	<resource type="Microsoft.Sql/servers/databases/auditingSettings">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Unassessed - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Sql/servers/firewallRules">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
 	<resource type="Microsoft.SqlVirtualMachine/SqlVirtualMachines">
 		<enabled>true</enabled>
 		<properties>
@@ -2563,6 +2914,40 @@
 				<func>notEquals</func>
 				<valtype>literal</valtype>
 				<value>global</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Storage/storageAccounts/blobServices/containers">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Storage/storageAccounts/fileServices/shares">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
 			</field>
 		</properties>
 	</resource>
@@ -2785,6 +3170,40 @@
 				<func>notEquals</func>
 				<valtype>literal</valtype>
 				<value>global</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Web/sites/config">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
+			</field>
+		</properties>
+	</resource>
+	<resource type="Microsoft.Web/sites/basicPublishingCredentialsPolicies">
+		<enabled>true</enabled>
+		<properties>
+			<field>
+				<name>provisioningState</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Succeeded</value>
+			</field>
+			<field>
+				<name>NOTE</name>
+				<func>equals</func>
+				<valtype>literal</valtype>
+				<value>Risk: Not Evaluated - This resource requires an ALL MODE ACP</value>
 			</field>
 		</properties>
 	</resource>
